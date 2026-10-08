@@ -52,6 +52,7 @@ TEMPLATE = r'''<!doctype html>
   --text:#0b0b0b; --text-2:#52514e; --muted:#8a8984;
   --pos:#2a78d6; --neg:#e34948; --neu:#c9c7c0;
   --reddit:#1baf7a; --dc:#4a3aa7; --steamforum:#eda100; --line:#2a78d6;
+  --tp1:#2a78d6; --tp2:#eb6834; --tp3:#1baf7a; --tp4:#eda100; --tp5:#e87ba4; --tp6:#008300; --tp7:#4a3aa7; --tp8:#e34948; --tp9:#b4b2aa;
   --grid:#e8e6e0; --chip-bg:#ecebe6; --warn-bg:#fff4cc; --warn-ink:#6b4b00;
 }
 @media (prefers-color-scheme: dark){
@@ -61,6 +62,7 @@ TEMPLATE = r'''<!doctype html>
     --text:#ffffff; --text-2:#c3c2b7; --muted:#8f8e86;
     --pos:#3987e5; --neg:#e66767; --neu:#4a4a46;
     --reddit:#199e70; --dc:#9085e9; --steamforum:#c98500; --line:#3987e5;
+    --tp1:#3987e5; --tp2:#d95926; --tp3:#199e70; --tp4:#c98500; --tp5:#d55181; --tp6:#008300; --tp7:#9085e9; --tp8:#e66767; --tp9:#5c5b56;
     --grid:#2b2b28; --chip-bg:#2a2a27; --warn-bg:#3a3014; --warn-ink:#f2d58a;
   }
 }
@@ -70,6 +72,7 @@ TEMPLATE = r'''<!doctype html>
   --text:#ffffff; --text-2:#c3c2b7; --muted:#8f8e86;
   --pos:#3987e5; --neg:#e66767; --neu:#4a4a46;
   --reddit:#199e70; --dc:#9085e9; --steamforum:#c98500; --line:#3987e5;
+  --tp1:#3987e5; --tp2:#d95926; --tp3:#199e70; --tp4:#c98500; --tp5:#d55181; --tp6:#008300; --tp7:#9085e9; --tp8:#e66767; --tp9:#5c5b56;
   --grid:#2b2b28; --chip-bg:#2a2a27; --warn-bg:#3a3014; --warn-ink:#f2d58a;
 }
 *{box-sizing:border-box}
@@ -181,6 +184,13 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 </section>
 
 <section class="card">
+  <div class="row"><div><h2>부정 반응 성격 추이</h2><div class="sub">커뮤니티별로 '부정'으로 분류된 게시글+댓글 전체가 어떤 주제인지 · 막대 하나 = 30분 창(100%) · 아래 막대 = 선택 기간 전체 비중</div></div>
+  <div class="btns" data-for="neg"><button data-r="1">24시간</button><button data-r="7" class="on">7일</button><button data-r="30">30일</button><button data-r="0">전체</button></div></div>
+  <div class="legend" id="neg-legend"></div>
+  <div class="grid three" id="neg-stacks"></div>
+</section>
+
+<section class="card">
   <div class="row"><div><h2>Top 3 논조 추이</h2><div class="sub">선: 수집 시작부터 누적한 긍정 ÷ (긍정+부정) · 막대: 각 30분 창의 Top 3 구성</div></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <div class="btns" data-for="t3m"><button data-r="0" class="on">게시글 논조</button><button data-r="1">달린 댓글 반응</button></div>
@@ -220,7 +230,10 @@ const fmt = (v, d=1) => v == null ? '–' : (+v).toFixed(d);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const P = s => new Date(s + '+09:00');
 const hm = d => `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-const range = {steam: 7, comm: 7, t3: 7, t3m: 0, vol: 7, volm: 0, hr: 7, hrm: 1};
+const range = {steam: 7, comm: 7, t3: 7, t3m: 0, vol: 7, volm: 0, hr: 7, hrm: 1, neg: 7};
+// 주제 색은 주제를 따라간다(순위가 아니라). 목록에 없는 주제(게임별 topic_extra 등)는 기타 색.
+const TOPICS = ['과금/BM', '버그/서버', '밸런스/직업', '작업장/핵', '운영/소통', '콘텐츠/업데이트', 'PvP/어비스', '커마/외형', '기타/잡담'];
+const tcol = t => '--tp' + (TOPICS.indexOf(t) >= 0 ? TOPICS.indexOf(t) + 1 : 9);
 
 // 0~23시 묶음 막대 (소스별 나란히). series: [{name,color,vals:[24], n:[24]}]
 function hourChart(box, series, label){
@@ -436,6 +449,26 @@ function render(){
     const av = sum.map((v, h) => n[h] ? v / n[h] : -1); const ph = av.indexOf(Math.max(...av));
     return ph >= 0 && av[ph] > 0 ? `${nm} ${ph}시` : null; }).filter(Boolean);
   $('#hour-note').textContent = `${hrName} 기준 · ${hrRuns.length}개 창(약 ${days}일)으로 계산` + (peak.length ? ` · 가장 많은 시간대: ${peak.join(', ')}` : '') + ' · 수집 기간이 짧으면 시간대별 표본이 적어 들쭉날쭉할 수 있습니다.';
+
+  // ---- 부정 반응 성격 추이 (창별 neg_topics)
+  $('#neg-legend').innerHTML = TOPICS.map(t => `<span><i style="background:var(${tcol(t)})"></i>${esc(t)}</span>`).join('');
+  const nr = filt(runs, 'slot_end', range.neg);
+  $('#neg-stacks').innerHTML = SRCS.map(([s, nm]) => `<div><div class="sub" style="margin:4px 0"><b style="color:var(--${s})">●</b> ${nm}</div><div id="neg-${s}"></div><div id="neg-sum-${s}" style="margin-top:6px"></div></div>`).join('');
+  for (const [s, nm] of SRCS){
+    const rows = nr.filter(r => r.sources[s] && r.sources[s].ok && r.sources[s].neg_topics);
+    const keyOf = t => TOPICS.includes(t) ? t : '기타/잡담';
+    const fold = obj => { const o = {}; for (const [t, c] of Object.entries(obj || {})) o[keyOf(t)] = (o[keyOf(t)] || 0) + c; return o; };
+    barChart($('#neg-' + s), rows.map(r => { const o = fold(r.sources[s].neg_topics), tot = Object.values(o).reduce((a, b) => a + b, 0);
+      return {label: hm(P(r.slot_end)), segs: TOPICS.map(t => ({v: o[t] || 0, c: tcol(t)})),
+        html: `<b>${nm} ${hm(P(r.slot_start))}~${hm(P(r.slot_end)).slice(6)}</b><br>부정 ${tot}건` + TOPICS.filter(t => o[t]).sort((a, b) => o[b] - o[a])
+          .map(t => `<div><b style="color:var(${tcol(t)})">■</b> ${esc(t)} ${o[t]}건 (${Math.round(o[t] / tot * 100)}%)</div>`).join('')}; }),
+      {stack: true, h: 150, label: nm + ' 부정 반응 주제'});
+    const sum = {}; rows.forEach(r => { for (const [t, c] of Object.entries(fold(r.sources[s].neg_topics))) sum[t] = (sum[t] || 0) + c; });
+    const tot = Object.values(sum).reduce((a, b) => a + b, 0) || 1;
+    $('#neg-sum-' + s).innerHTML = rows.length ? Object.entries(sum).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t, c]) =>
+      `<div class="hbar"><span>${esc(t)}</span><div class="tr"><span style="width:${c / tot * 100}%;background:var(${tcol(t)})"></span></div><span class="muted" style="text-align:right">${Math.round(c / tot * 100)}%</span></div>`).join('')
+      + `<div class="note">선택 기간 부정 ${tot.toLocaleString()}건 기준</div>` : '';
+  }
 
   // ---- Top3 누적
   const sum = $('#t3-summary'); sum.innerHTML = '';

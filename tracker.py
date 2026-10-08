@@ -905,6 +905,38 @@ def current_window(now=None):
     return we - WINDOW, we
 
 
+def neg_topic_counts(items):
+    """부정으로 분류된 항목(게시글+댓글)의 주제 분포 {주제: 건수} — 대시보드 '부정 반응 성격 추이'용."""
+    from collections import Counter
+    return dict(Counter(S.topic_of(it.get('text', '')) for it in items if it.get('label') == '부정'))
+
+
+def ensure_neg_topics():
+    """neg_topics 가 없는 과거 회차를 그 창의 항목 파일로 채운다(기능 추가 전 회차, 1회성)."""
+    runs_p = os.path.join(DATA, 'runs.jsonl')
+    runs = read_jsonl(runs_p)
+    todo = [r for r in runs if any(o.get('ok') and 'neg_topics' not in o for o in r['sources'].values())]
+    if not todo:
+        return
+    with DataLock():
+        runs = read_jsonl(runs_p)
+        n = 0
+        for r in runs:
+            if not any(o.get('ok') and 'neg_topics' not in o for o in r['sources'].values()):
+                continue
+            its = read_jsonl(item_path(r['slot_end']))
+            for src, o in r['sources'].items():
+                if o.get('ok') and 'neg_topics' not in o:
+                    o['neg_topics'] = neg_topic_counts([x for x in its if x['src'] == src])
+            n += 1
+        tmp = runs_p + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            for r in runs:
+                f.write(json.dumps(r, ensure_ascii=False) + '\n')
+        os.replace(tmp, runs_p)
+    log(f'[neg-topics] 과거 {n}개 창의 부정 반응 주제 분포를 채움')
+
+
 def summarize(items):
     c = {'긍정': 0, '중립': 0, '부정': 0}
     for it in items:
@@ -1131,6 +1163,7 @@ def _run_community(now=None):
         st = summarize(posts + comments)
         stats[src] = st
         src_out[src] = {'ok': True, **st, 'top3': top3(src, posts, comments, meta),
+                        'neg_topics': neg_topic_counts(posts + comments),
                         'meta': {k: v for k, v in meta.items() if k not in ('hot_rank', 'reply_total')}}
         all_items += posts + comments
         log(f"[{src}] 게시글 {st['posts']} · 댓글 {st['comments']} → 긍정 {st['pos_pct']}% / 부정 {st['neg_pct']}% {src_out[src]['meta']}")
@@ -1211,6 +1244,7 @@ def _rescore(nb, labeled):
             if 'orig' not in so:
                 so['orig'] = {k: so.get(k) for k in ('pos', 'neu', 'neg', 'pos_pct', 'neg_pct', 'pos_share')}
             so.update(summarize(its))
+            so['neg_topics'] = neg_topic_counts(its)
             for t in so.get('top3') or []:
                 pid = t.get('post_id') or _pid_from_url(src, t.get('url'))
                 t['post_id'] = pid
@@ -1234,6 +1268,10 @@ def _rescore(nb, labeled):
 
 def build_dashboard():
     import dashboard
+    try:
+        ensure_neg_topics()
+    except Exception as e:  # noqa
+        log(f'[neg-topics] 채우기 실패: {e}')
     nb, labeled, files = build_model()
     runs = read_jsonl(os.path.join(DATA, 'runs.jsonl'))
     for r in runs[-200:]:  # 외국어 Top3 제목 번역(캐시에 없는 것만 요청)
