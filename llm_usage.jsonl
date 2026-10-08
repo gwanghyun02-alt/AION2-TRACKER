@@ -455,3 +455,7 @@
 {"ts": "2026-10-09T07:11:16", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 25, "in": 2, "out": 502, "cache_read": 21211, "cache_write": 3209, "usd": 0.0, "notional_usd": 0.0221}
 {"ts": "2026-10-09T07:11:20", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9285, "usd": 0.0, "notional_usd": 0.05631}
 {"ts": "2026-10-09T07:11:21", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9446, "usd": 0.0, "notional_usd": 0.05695}
+{"ts": "2026-10-09T07:40:12", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8240, "usd": 0.0, "notional_usd": 0.05213}
+{"ts": "2026-10-09T07:40:17", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 37, "in": 2, "out": 718, "cache_read": 21211, "cache_write": 4719, "usd": 0.0, "notional_usd": 0.0303}
+{"ts": "2026-10-09T07:40:21", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8700, "usd": 0.0, "notional_usd": 0.05397}
+{"ts": "2026-10-09T07:40:21", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9065, "usd": 0.0, "notional_usd": 0.05543}
