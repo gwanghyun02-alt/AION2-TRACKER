@@ -1,0 +1,1 @@
+{"sig": "ff38e991f4eb7570e94cfe02b5e9d3fc:2026-10-06b", "sel": {"n": 419, "lexicon": 66.8, "model": 66.8, "logreg_best": 65.4, "best": null, "trials": [[[0.003, 25, false], 59.2], [[0.01, 25, false], 61.3], [[0.03, 25, false], 65.4], [[0.003, 25, true], 59.7], [[0.01, 25, true], 60.1]]}}

@@ -1,0 +1,7 @@
+labels_cache.json
+label_reasons.jsonl
+user_lexicon.json
+.lock
+*.tmp
+backup/
+public/
