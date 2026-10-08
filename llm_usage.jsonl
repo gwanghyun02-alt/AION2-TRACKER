@@ -250,3 +250,11 @@
 {"ts": "2026-10-08T13:40:21", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8307, "usd": 0.0, "notional_usd": 0.05239}
 {"ts": "2026-10-08T13:40:21", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9159, "usd": 0.0, "notional_usd": 0.0558}
 {"ts": "2026-10-08T13:40:25", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 30, "in": 2, "out": 592, "cache_read": 21211, "cache_write": 3720, "usd": 0.0, "notional_usd": 0.02505}
+{"ts": "2026-10-08T14:11:11", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 10635, "usd": 0.0, "notional_usd": 0.06171}
+{"ts": "2026-10-08T14:11:19", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8249, "usd": 0.0, "notional_usd": 0.05216}
+{"ts": "2026-10-08T14:11:19", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9232, "usd": 0.0, "notional_usd": 0.05609}
+{"ts": "2026-10-08T14:11:20", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 7218, "usd": 0.0, "notional_usd": 0.04804}
+{"ts": "2026-10-08T14:11:20", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9662, "usd": 0.0, "notional_usd": 0.05781}
+{"ts": "2026-10-08T14:11:23", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 12, "in": 2, "out": 268, "cache_read": 21211, "cache_write": 1814, "usd": 0.0, "notional_usd": 0.01418}
+{"ts": "2026-10-08T14:11:28", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8645, "usd": 0.0, "notional_usd": 0.05375}
+{"ts": "2026-10-08T14:11:28", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9515, "usd": 0.0, "notional_usd": 0.05723}
