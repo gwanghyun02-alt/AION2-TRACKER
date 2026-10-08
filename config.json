@@ -1,0 +1,44 @@
+{
+  "game": "아이온2",
+  "game_en": "AION2",
+  "task_prefix": "AION2Tracker",
+  "steam_appid": 3393110,
+  "reddit_sub": "Aion2",
+  "reddit_bots": [
+    "automoderator",
+    "aion2-modteam"
+  ],
+  "dc_id": "aion2",
+  "dc_type": "mgallery",
+  "steam_forums": {
+    "1": "General Discussion",
+    "6": "Essential Info",
+    "5": "Translations"
+  },
+  "topic_extra": {
+    "밸런스/직업": [
+      "수호성",
+      "검성",
+      "살성",
+      "궁성",
+      "마도성",
+      "정령성",
+      "치유성",
+      "호법성",
+      "gladiator",
+      "templar",
+      "assassin",
+      "ranger",
+      "sorcerer",
+      "sorceror",
+      "cleric",
+      "chanter",
+      "spiritmaster"
+    ],
+    "PvP/어비스": [
+      "어비스",
+      "abyss"
+    ]
+  },
+  "review_every_min": 0
+}
