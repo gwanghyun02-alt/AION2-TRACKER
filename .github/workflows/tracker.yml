@@ -3,7 +3,9 @@ name: tracker
 # 데이터는 data 브랜치(커밋 누적), 대시보드는 GitHub Pages(Actions 배포).
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # 예약 실행은 '일정을 마지막으로 바꾼 커밋 작성자' 권한으로 돈다. 작성자가 실제 GitHub 계정이 아니면
+    # 예약 실행이 아예 시작되지 않는다(2026-10-08, game-tracker 이름으로 커밋했을 때 75분간 0회).
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
 concurrency:
   group: tracker
