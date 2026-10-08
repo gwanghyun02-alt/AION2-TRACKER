@@ -298,3 +298,10 @@
 {"ts": "2026-10-08T17:05:30", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8709, "usd": 0.0, "notional_usd": 0.054}
 {"ts": "2026-10-08T17:05:31", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 7013, "usd": 0.0, "notional_usd": 0.04722}
 {"ts": "2026-10-08T17:05:36", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 60, "in": 2, "out": 1132, "cache_read": 21211, "cache_write": 5353, "usd": 0.0, "notional_usd": 0.03698}
+{"ts": "2026-10-08T17:41:11", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 9558, "usd": 0.0, "notional_usd": 0.0574}
+{"ts": "2026-10-08T17:41:19", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 7636, "usd": 0.0, "notional_usd": 0.04971}
+{"ts": "2026-10-08T17:41:20", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8022, "usd": 0.0, "notional_usd": 0.05125}
+{"ts": "2026-10-08T17:41:22", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8688, "usd": 0.0, "notional_usd": 0.05392}
+{"ts": "2026-10-08T17:41:25", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 7146, "usd": 0.0, "notional_usd": 0.04775}
+{"ts": "2026-10-08T17:41:30", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 80, "in": 2, "out": 1492, "cache_read": 21211, "cache_write": 8988, "usd": 0.0, "notional_usd": 0.05512}
+{"ts": "2026-10-08T17:41:36", "tag": "run", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 30, "in": 2, "out": 592, "cache_read": 21211, "cache_write": 3922, "usd": 0.0, "notional_usd": 0.02585}
