@@ -785,3 +785,11 @@ RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
 [2026-10-08 10:43:25] [reddit] 게시글 6 · 댓글 145 → 긍정 5.3% / 부정 39.1% {'comment_pages': 2}
 [2026-10-08 10:43:25] [dc] 게시글 40 · 댓글 219 → 긍정 4.2% / 부정 7.3% {'list': 'pc', 'views_fetched': 60, 'views_planned': 60, 'partial': False, 'prev_window_revisits': 20}
 [2026-10-08 10:43:25] [steamforum] 게시글 2 · 댓글 27 → 긍정 6.9% / 부정 37.9% {'topics_active': 18}
+[2026-10-08 11:01:00] [steam] SteamDB 63.88% / Steam 64.66% (10,756+ / 5,878-) Mixed
+[2026-10-08 11:01:00] [community] 창 10-08 10:30 ~ 11:00 수집 시작
+[2026-10-08 11:04:26] [ai] 353/353건 AI 분류 (23초, 조합 h_only)
+[2026-10-08 11:04:26] [reddit] 게시글 3 · 댓글 118 → 긍정 10.7% / 부정 32.2% {'comment_pages': 2}
+[2026-10-08 11:04:26] [dc] 게시글 53 · 댓글 151 → 긍정 2.0% / 부정 6.4% {'list': 'pc', 'views_fetched': 59, 'views_planned': 59, 'partial': False, 'prev_window_revisits': 6}
+[2026-10-08 11:04:26] [steamforum] 게시글 4 · 댓글 24 → 긍정 3.6% / 부정 57.1% {'topics_active': 12}
+[2026-10-08 11:24:26] [neg-topics] 채우기 실패: 데이터 잠금 대기 시간 초과
+[2026-10-08 11:24:31] [neg-topics] 과거 72개 창의 부정 반응 주제 분포를 채움
