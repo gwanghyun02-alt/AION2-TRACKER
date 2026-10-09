@@ -40,5 +40,41 @@
       "abyss"
     ]
   },
-  "review_every_min": 0
+  "review_every_min": 0,
+  "glossary": {
+    "Elyos": "천족",
+    "Asmodian / Asmo": "마족",
+    "Daeva": "데바",
+    "Kinah": "키나",
+    "Abyss": "어비스",
+    "Gladiator": "검성",
+    "Templar": "수호성",
+    "Assassin": "살성",
+    "Ranger": "궁성",
+    "Sorcerer / Sorceror": "마도성",
+    "Spiritmaster": "정령성",
+    "Cleric": "치유성",
+    "Chanter": "호법성",
+    "Legion": "레기온(길드)",
+    "Combat Power / CP / power": "전투력",
+    "Gear Score / GS": "장비 점수",
+    "Purple": "퍼플(엔씨 런처)",
+    "NC / NCSoft / NCsoft": "엔씨",
+    "Early Access / EA": "얼리 액세스",
+    "Cosmetics / outfit / skin": "치장·외형 아이템",
+    "P2W / pay to win": "페이투윈",
+    "F2P": "무과금",
+    "whale": "고래(고과금 유저)",
+    "grind": "파밍·노가다",
+    "end game": "엔드게임",
+    "BiS": "종결템",
+    "stats": "스탯",
+    "PSA": "주의/알림",
+    "AFK": "잠수",
+    "RNG": "확률(운)",
+    "dungeon / instance": "던전(인던)",
+    "raid": "레이드",
+    "server transfer": "서버 이전"
+  },
+  "glossary_note": "확실하지 않은 고유명사(예: Odyle, Quna)는 한국어로 옮기되 원문을 괄호로 병기"
 }

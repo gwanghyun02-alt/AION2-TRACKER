@@ -339,3 +339,103 @@ def evaluate(rows, game, lex_fn, k=5, model=MODEL):
     return {'ok': True, 'n': len(rows), 'lexicon': lexicon, 'scores': scores, 'best': best,
             'best_score': scores[best], 'threshold': round(lexicon + MARGIN, 1),
             'passed': scores[best] >= lexicon + MARGIN, 'failed': failed}
+
+
+# ---------------------------------------------------------------- 게임 맥락 번역 (2026-10-09)
+# Google 번역은 게임 용어를 일반 단어로 옮겼다(Gladiator→검투사, Cosmetics→화장품, abyss→심연, power→전력).
+# 화면에 보이는 외국어(Top3 제목·검토 엑셀)만 Claude 로 게임 맥락 번역한다. 구독 → API → (호출부) Google 순.
+TR_SCHEMA = {
+    'type': 'object',
+    'properties': {'results': {'type': 'array', 'items': {
+        'type': 'object', 'properties': {'i': {'type': 'integer'}, 'ko': {'type': 'string'}},
+        'required': ['i', 'ko'], 'additionalProperties': False}}},
+    'required': ['results'], 'additionalProperties': False,
+}
+TR_BATCH = 60
+
+
+def _tr_system(game, glossary, note):
+    gl = '\n'.join(f'- {k} → {v}' for k, v in (glossary or {}).items())
+    return f"""당신은 MMORPG '{game}'의 해외 커뮤니티(Reddit, Steam 토론) 글을 한국 게이머가 읽기 자연스러운 한국어로 번역합니다.
+모든 글은 이 게임에 관한 글입니다. 일반 사전 뜻이 아니라 게임 맥락의 뜻으로 옮기세요.
+
+규칙
+- 아래 용어집의 표현은 반드시 용어집대로 옮깁니다(대소문자·복수형 무관).
+- 게이머 은어는 한국 게이머가 쓰는 표현으로 옮깁니다(예: grind→파밍/노가다, nerf→너프, carry→캐리, gatekeep→진입장벽).
+- 비꼼·조롱·욕설의 뉘앙스와 어조를 살립니다. 순화하거나 설명을 덧붙이지 않습니다.
+- {note or '확실하지 않은 고유명사는 원문을 괄호로 병기합니다.'}
+- 숫자·단위는 한국식으로(80k → 8만). 오타(bouton 등)는 뜻대로 옮깁니다.
+- 번역문만 출력합니다.
+
+용어집
+{gl}"""
+
+
+def translate_items(texts, game, glossary=None, note=None, tag='translate'):
+    """texts(list[str]) → list[str|None]. 실패한 항목은 None(호출부가 Google 로 대체)."""
+    if not texts:
+        return []
+    import subprocess
+    import tempfile
+    system = _tr_system(game, glossary, note)
+    exe = claude_cli()
+    out = [None] * len(texts)
+    state = {'cli_fail': 0 if exe else 99}
+    env = {k: v for k, v in os.environ.items() if k not in ('ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN')}
+
+    def via_cli(batch):
+        payload = [{'i': k, 'text': t[:TEXT_CHARS]} for k, t in enumerate(batch)]
+        with tempfile.TemporaryDirectory() as td:
+            sp = os.path.join(td, 'system.txt')
+            open(sp, 'w', encoding='utf-8').write(system)
+            r = subprocess.run([exe, '-p', 'stdin 의 JSON 배열 각 항목 text 를 지침대로 번역해 results 로 답하라.',
+                                '--model', 'sonnet', '--system-prompt-file', sp, '--tools', '', '--strict-mcp-config',
+                                '--mcp-config', '{"mcpServers":{}}', '--no-session-persistence',
+                                '--json-schema', json.dumps(TR_SCHEMA), '--output-format', 'json'],
+                               input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True,
+                               encoding='utf-8', cwd=td, env=env, timeout=600,
+                               creationflags=getattr(__import__('subprocess'), 'CREATE_NO_WINDOW', 0))
+        d = json.loads(r.stdout)
+        if d.get('is_error'):
+            raise RuntimeError(str(d.get('result'))[:200])
+        u = d.get('usage', {})
+        _log_usage({'ts': datetime.now(KST).strftime('%Y-%m-%dT%H:%M:%S'), 'tag': tag, 'backend': 'subscription',
+                    'model': ','.join(d.get('modelUsage', {}).keys()), 'n': len(batch),
+                    'in': u.get('input_tokens', 0), 'out': u.get('output_tokens', 0),
+                    'cache_read': u.get('cache_read_input_tokens', 0), 'cache_write': u.get('cache_creation_input_tokens', 0),
+                    'usd': 0.0, 'notional_usd': round(d.get('total_cost_usd', 0), 5)})
+        return (d.get('structured_output') or json.loads(d['result']))['results']
+
+    def via_api(batch):
+        if not api_key() or within_api_budget() is False:
+            raise RuntimeError('API 사용 불가(키 없음 또는 일일 예산 초과)')
+        client = _client()
+        payload = [{'i': k, 'text': t[:TEXT_CHARS]} for k, t in enumerate(batch)]
+        resp = client.messages.create(model=MODEL, max_tokens=8000, thinking={'type': 'disabled'},
+                                      system=[{'type': 'text', 'text': system, 'cache_control': {'type': 'ephemeral'}}],
+                                      messages=[{'role': 'user', 'content': '다음 항목을 번역하세요.\n' + json.dumps(payload, ensure_ascii=False)}],
+                                      output_config={'format': {'type': 'json_schema', 'schema': TR_SCHEMA}})
+        u = resp.usage
+        _log_usage({'ts': datetime.now(KST).strftime('%Y-%m-%dT%H:%M:%S'), 'tag': tag + ':api', 'model': MODEL, 'n': len(batch),
+                    'in': u.input_tokens, 'out': u.output_tokens, 'cache_read': getattr(u, 'cache_read_input_tokens', 0) or 0,
+                    'cache_write': getattr(u, 'cache_creation_input_tokens', 0) or 0, 'usd': round(_cost(MODEL, u), 5)})
+        return json.loads(next(b.text for b in resp.content if b.type == 'text'))['results']
+
+    for s0 in range(0, len(texts), TR_BATCH):
+        batch = texts[s0:s0 + TR_BATCH]
+        res = None
+        if state['cli_fail'] < 2:
+            try:
+                res = via_cli(batch)
+                state['cli_fail'] = 0
+            except Exception:  # noqa
+                state['cli_fail'] += 1
+        if res is None:
+            try:
+                res = via_api(batch)
+            except Exception:  # noqa
+                res = []
+        for r in res:
+            if 0 <= r['i'] < len(batch) and r.get('ko', '').strip():
+                out[s0 + r['i']] = r['ko'].strip()
+    return out

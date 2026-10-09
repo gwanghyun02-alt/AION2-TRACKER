@@ -101,3 +101,51 @@ def to_ko(text, limit=1500):
         time.sleep(1)
     _fails += 1  # 연속 3건 실패하면 이 회차 번역 중단
     return ''
+
+
+# ---------------------------------------------------------------- 게임 맥락 번역(Claude) 캐시
+GAME_CACHE_P = os.path.join(BASE, 'data', 'translations_game.json')
+_gcache = None
+
+
+def _gload():
+    global _gcache
+    if _gcache is None:
+        try:
+            _gcache = json.load(open(GAME_CACHE_P, encoding='utf-8'))
+        except Exception:  # noqa
+            _gcache = {}
+    return _gcache
+
+
+def to_ko_many(texts, game, glossary=None, note=None, limit=300, tag='translate'):
+    """여러 외국어 문장을 게임 맥락으로 번역(Claude). {원문: 번역} 반환. 한국어는 ''.
+    Claude 가 실패한 문장은 Google 번역(to_ko)으로 대체하되, 그 결과는 게임 캐시에 넣지 않아 다음에 다시 시도한다."""
+    gc = _gload()
+    out, todo = {}, []
+    for t in dict.fromkeys(texts):
+        tt = (t or '').strip()[:limit]
+        if not tt or is_korean(tt):
+            out[t] = ''
+            continue
+        k = _key(tt)
+        if k in gc:
+            out[t] = gc[k]
+        else:
+            todo.append((t, tt, k))
+    if todo:
+        try:
+            import llm
+            res = llm.translate_items([tt for _, tt, _ in todo], game, glossary, note, tag=tag)
+        except Exception:  # noqa
+            res = [None] * len(todo)
+        for (t, tt, k), ko in zip(todo, res):
+            if ko:
+                gc[k] = ko
+                out[t] = ko
+            else:
+                out[t] = to_ko(tt, limit)
+        tmp = GAME_CACHE_P + '.tmp'
+        json.dump(gc, open(tmp, 'w', encoding='utf-8'), ensure_ascii=False)
+        os.replace(tmp, GAME_CACHE_P)
+    return out

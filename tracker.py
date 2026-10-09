@@ -1063,11 +1063,13 @@ def write_review_xlsx(items, ws, we, run_stats):
     inp = PatternFill('solid', fgColor='FFF4CC')
     inp2 = PatternFill('solid', fgColor='FDEBD0')
     wrap_cols = {col[n] for n in ('이유 설명', '본문', '번역(한국어)', '게시글 제목', '근거 키워드')}
+    gko = TR.to_ko_many([it['text'][:1500] for it in pick] + [it.get('title', '')[:200] for it in pick], GAME,
+                        CFG.get('glossary'), CFG.get('glossary_note'), limit=1500, tag='translate-review')
     for k, it in enumerate(pick, 1):
         r = hdr_row + k
-        ko = TR.to_ko(it['text'])          # 한국어 글이면 '' (번역 불필요)
+        ko = gko.get(it['text'][:1500], '')          # 한국어 글이면 '' (번역 불필요)
         title = it.get('title', '')[:200]
-        title_ko = TR.to_ko(title, 300) if title and title != it['text'][:len(title)] else ''
+        title_ko = gko.get(title, '') if title and title != it['text'][:len(title)] else ''
         if title_ko:
             title = f'{title}\n({title_ko})'
         vals = {'No': k, '출처': SRC_NAME[it['src']], '유형': it['kind'], '본문': it['text'][:2000],
@@ -1274,11 +1276,11 @@ def build_dashboard():
         log(f'[neg-topics] 채우기 실패: {e}')
     nb, labeled, files = build_model()
     runs = read_jsonl(os.path.join(DATA, 'runs.jsonl'))
-    for r in runs[-200:]:  # 외국어 Top3 제목 번역(캐시에 없는 것만 요청)
-        for o in r['sources'].values():
-            for t in (o.get('top3') or []):
-                if 'title_ko' not in t:
-                    t['title_ko'] = TR.to_ko(t['title'], 300)
+    # 외국어 Top3 제목: 게임 맥락 번역(Claude, 캐시) — 일반 번역은 Gladiator→검투사 같은 오역을 냈다
+    tops = [t for r in runs[-200:] for o in r['sources'].values() for t in (o.get('top3') or [])]
+    ko = TR.to_ko_many([t['title'] for t in tops], GAME, CFG.get('glossary'), CFG.get('glossary_note'), tag='translate-top3')
+    for t in tops:
+        t['title_ko'] = ko.get(t['title'], '')
     TR.save()
     steam = read_jsonl(os.path.join(DATA, 'steam.jsonl'))
     labels = {'labeled': len(labeled), 'files': files, 'usable': bool(nb and nb.usable),
