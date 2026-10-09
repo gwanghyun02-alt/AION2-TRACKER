@@ -1,1 +1,1 @@
-{"sig": "5df6717c0c1ff250d386087f323567b3:2026-10-09a", "sel": {"n": 419, "lexicon": 81.4, "model": 81.4, "logreg_best": 65.9, "best": null, "trials": [[[0.003, 25, false], 65.4], [[0.01, 25, false], 65.9], [[0.03, 25, false], 65.9], [[0.003, 25, true], 64.2], [[0.01, 25, true], 64.0]]}}
+{"sig": "bde3fe6deb5ff1fcaa12bdfe498e51bb:2026-10-09a", "sel": {"n": 717, "lexicon": 83.5, "model": 83.5, "logreg_best": 73.2, "best": null, "trials": [[[0.003, 25, false], 69.9], [[0.01, 25, false], 72.2], [[0.03, 25, false], 73.2], [[0.003, 25, true], 68.3], [[0.01, 25, true], 70.2]]}}
