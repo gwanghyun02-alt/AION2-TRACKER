@@ -1371,3 +1371,9 @@ RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
 [2026-10-10 03:11:02] [dc] 게시글 39 · 댓글 161 → 긍정 8.0% / 부정 14.5% {'list': 'pc', 'views_fetched': 48, 'views_planned': 48, 'partial': False, 'prev_window_revisits': 9}
 [2026-10-10 03:11:03] [steamforum] 게시글 7 · 댓글 46 → 긍정 15.1% / 부정 18.9% {'topics_active': 32}
 [2026-10-10 03:22:34] [steam] SteamDB 61.29% / Steam 61.88% (12,948+ / 7,975-) Mixed
+[2026-10-10 03:37:29] [steam] SteamDB 61.29% / Steam 61.88% (12,948+ / 7,975-) Mixed
+[2026-10-10 03:37:29] [community] 창 10-10 03:00 ~ 03:30 수집 시작
+[2026-10-10 03:39:01] [reddit] 429 /r/Aion2/comments/.rss?limit=100&after=t1_pewcvks (재시도 1)
+[2026-10-10 03:42:02] [reddit] 게시글 7 · 댓글 196 → 긍정 11.3% / 부정 23.2% {'comment_pages': 3}
+[2026-10-10 03:42:02] [dc] 게시글 25 · 댓글 106 → 긍정 8.4% / 부정 10.7% {'list': 'pc', 'views_fetched': 33, 'views_planned': 33, 'partial': False, 'prev_window_revisits': 8}
+[2026-10-10 03:42:02] [steamforum] 게시글 8 · 댓글 57 → 긍정 16.9% / 부정 29.2% {'topics_active': 37}
