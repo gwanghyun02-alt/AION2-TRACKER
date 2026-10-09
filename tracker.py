@@ -712,7 +712,12 @@ def build_model():
     return nb, labeled, files
 
 
-_QUOTE = re.compile(r"[\"'“”‘’「」『』]([^\"'“”‘’「」『』\n]{1,20})[\"'“”‘’「」『』]")
+# 같은 종류의 따옴표끼리만 짝을 짓는다. 예전 규칙(아무 따옴표나 짝, 20자 제한)은 "A 긴 표현", "B" 처럼
+# 나란히 적힌 이유에서 '", "' 사이의 쉼표를 표현으로 뽑아 부정 -2 로 등록했고, isn't 의 ' 를 따옴표로 봐
+# 'isn' 을 잘랐다(2026-10-09 사용자 발견). 단어 안 아포스트로피는 따옴표가 아니다.
+_QUOTE = re.compile(r'"([^"\n]{1,60})"|“([^”\n]{1,60})”|‘([^’\n]{1,60})’|「([^」\n]{1,60})」|『([^』\n]{1,60})』'
+                    r"|(?<![A-Za-z])'([^'\n]{1,60}?)'(?![A-Za-z])")
+_HAS_WORD = re.compile(r'[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]')
 _REASON_W = {'긍정': 2.0, '부정': -2.0, '중립': 0.0}
 
 
@@ -724,8 +729,8 @@ def user_lexicon(labeled):
     for r in labeled:
         terms, unmatched = [], []
         for m in _QUOTE.finditer(r.get('reason') or ''):
-            t = m.group(1).strip().lower()
-            if len(t) < 1:
+            t = next(g for g in m.groups() if g is not None).strip().lower()
+            if not _HAS_WORD.search(t):  # 쉼표·기호만 있는 표현은 버린다
                 continue
             (terms if t in (r['text'] or '').lower() else unmatched).append(t)
         for t in terms:

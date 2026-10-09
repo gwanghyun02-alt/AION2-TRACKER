@@ -89,7 +89,7 @@ POS.update({
 })
 
 # 사전을 손보면 이 값을 바꾼다 → 라벨 지문이 바뀌어 다음 실행에 과거 수집분 전체가 재계산된다
-LEXICON_VERSION = '2026-10-06b'
+LEXICON_VERSION = '2026-10-09a'  # 이유 따옴표 추출 버그 수정(쉼표가 부정 표현으로 등록되던 문제)
 
 # 영어 부정어: 뒤 3토큰 안의 감성어 부호를 뒤집는다
 EN_NEGATORS = {'not', 'no', 'never', "don't", 'dont', "isn't", 'isnt', "wasn't", 'wasnt', "can't", 'cant',
