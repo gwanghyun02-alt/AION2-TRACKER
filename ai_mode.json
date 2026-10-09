@@ -1,7 +1,7 @@
 {
- "enabled": true,
+ "enabled": false,
  "variant": "h_only",
- "last_eval_n": 359,
+ "last_eval_n": 717,
  "history": [
   {
    "ok": true,
@@ -39,7 +39,27 @@
    "failed": 0,
    "ts": "2026-10-07T18:05:49",
    "seconds": 45
+  },
+  {
+   "ok": true,
+   "n": 717,
+   "lexicon": 83.5,
+   "scores": {
+    "ai_only": 71.3,
+    "h_only": 84.1,
+    "hm": 74.9,
+    "neutral_hm": 72.2,
+    "neutral_h": 83.5
+   },
+   "best": "h_only",
+   "best_score": 84.1,
+   "threshold": 88.5,
+   "passed": false,
+   "failed": 0,
+   "ts": "2026-10-09T13:41:47",
+   "seconds": 83
   }
  ],
- "enabled_at": "2026-10-07T18:05:49"
+ "enabled_at": "2026-10-07T18:05:49",
+ "disabled_at": "2026-10-09T13:41:47"
 }
