@@ -324,14 +324,36 @@ class Learner:
         return self.model is not None
 
 
+USER_LEX_BUILDER = None  # tracker 가 지정: 라벨 행 → 사용자 사전. 교차검증 fold 마다 학습 몫으로만 다시 만든다
+
+
+def fold_lexicon(train):
+    """교차검증 한 fold 동안 사용자 사전을 train 라벨의 이유로만 만든다(채점 라벨의 이유가 새지 않게).
+    반환값(이전 사전)을 restore_lexicon 에 넘겨 되돌린다."""
+    saved = dict(USER_LEX)
+    if USER_LEX_BUILDER is not None:
+        set_user_lexicon(USER_LEX_BUILDER(train))
+    return saved
+
+
+def restore_lexicon(saved):
+    set_user_lexicon(saved)
+
+
 def _cv_acc(rows, make, k=5):
+    # 2026-10-10: 사용자 사전(이유 속 따옴표 표현)을 전체 라벨로 만든 채 채점하면 채점 라벨의 답을 미리 아는 셈이라
+    # 사전 정확도가 부풀었다(717건에서 83.5%). fold 마다 학습 몫으로만 사전을 다시 만든다.
     hit = 0
     for f in range(k):
         test = rows[f::k]
         train = [r for i, r in enumerate(rows) if i % k != f]
-        m = make(train)
-        for r in test:
-            hit += classify(r['text'], m, use_exact=False)['label'] == r['label']
+        saved = fold_lexicon(train)
+        try:
+            m = make(train)
+            for r in test:
+                hit += classify(r['text'], m, use_exact=False)['label'] == r['label']
+        finally:
+            restore_lexicon(saved)
     return hit / len(rows) * 100
 
 

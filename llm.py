@@ -327,8 +327,14 @@ def evaluate(rows, game, lex_fn, k=5, model=MODEL):
         train = [r for i, r in enumerate(rows) if i % k != f]
         res, errs = classify_items(test, game, train, model=model, tag='auto-eval', workers=2, allow_api=False)
         errors += errs
-        for r, got in zip(test, res):
-            preds.append((r['label'], lex_fn(r['text']), got[0] if got else None, got[1] if got else None))
+        import sentiment as _S
+        saved = _S.fold_lexicon(train)  # 사전도 채점 라벨의 이유를 모르는 상태로(2026-10-10 누수 수정)
+        try:
+            lex_preds = [lex_fn(r['text']) for r in test]
+        finally:
+            _S.restore_lexicon(saved)
+        for r, got, lp in zip(test, res, lex_preds):
+            preds.append((r['label'], lp, got[0] if got else None, got[1] if got else None))
     failed = sum(1 for p in preds if p[2] is None)
     if failed > len(preds) * 0.1:  # 한도 소진 등으로 10% 넘게 실패하면 이번 시험은 무효
         return {'ok': False, 'n': len(rows), 'failed': failed, 'errors': errors[:3]}

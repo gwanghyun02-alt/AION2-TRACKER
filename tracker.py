@@ -693,6 +693,7 @@ def load_labels():
 
 def build_model():
     labeled, files = load_labels()
+    S.USER_LEX_BUILDER = lambda rows: user_lexicon(rows, write=False)
     S.set_user_lexicon(user_lexicon(labeled))
     # 학습기: 라벨이 바뀔 때만 교차검증으로 모델을 다시 고르고(수 초), 결과는 지문별로 캐시한다.
     # 로지스틱 회귀가 '사전만'보다 CV 정확도가 높을 때만 채택 — 학습이 성능을 깎지 못하게(2026-10-06 NB 사고).
@@ -721,7 +722,7 @@ _HAS_WORD = re.compile(r'[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]')
 _REASON_W = {'긍정': 2.0, '부정': -2.0, '중립': 0.0}
 
 
-def user_lexicon(labeled):
+def user_lexicon(labeled, write=True):
     """'이유 설명'에 따옴표로 적은 표현 중 실제 본문에 있는 것을 사전에 넣는다.
     긍정 +2 / 부정 -2 / 중립 0(그 표현은 판단 근거 아님). 여러 라벨이 엇갈리면 다수결, 동률이면 0.
     모든 이유는 data/label_reasons.jsonl 로 모아 둔다 — 사전·규칙을 손볼 때 먼저 읽는 자료."""
@@ -745,6 +746,8 @@ def user_lexicon(labeled):
         top = max(c.values())
         winners = [l for l, n in c.items() if n == top]
         lex[t] = _REASON_W[winners[0]] if len(winners) == 1 else 0.0
+    if not write:
+        return lex
     try:
         with open(os.path.join(DATA, 'label_reasons.jsonl'), 'w', encoding='utf-8') as f:
             for row in out_rows:
@@ -838,11 +841,14 @@ def apply_ai(items, labeled, user):
         + (f" · 오류 {errs[0][:120]}" if errs else ''))
 
 
+EVAL_VERSION = '2026-10-10-noleak'  # 평가 방식이 바뀌면 라벨 수와 무관하게 한 번 다시 시험한다
+
+
 def maybe_retest_ai(labeled):
     """라벨이 지난 시험보다 AI_RETEST_EVERY 건 이상 늘었으면 5-fold 로 다시 시험한다(구독 경로만).
     가장 좋은 조합이 '사전 + 5%p' 이상이면 그 조합으로 AI 분류를 켠다(사용자 합의 기준, 2026-10-07)."""
     st = ai_state()
-    if len(labeled) < st.get('last_eval_n', 0) + AI_RETEST_EVERY:
+    if len(labeled) < st.get('last_eval_n', 0) + AI_RETEST_EVERY and st.get('eval_version') == EVAL_VERSION:
         return
     import llm
     log(f"[ai-eval] 라벨 {len(labeled)}건 (지난 시험 {st.get('last_eval_n', 0)}건) → AI 재시험 시작")
@@ -856,6 +862,7 @@ def maybe_retest_ai(labeled):
         save_ai_state(st)
         return
     st['last_eval_n'] = r['n']
+    st['eval_version'] = EVAL_VERSION
     if r['passed']:
         st['enabled'], st['variant'], st['enabled_at'] = True, r['best'], r['ts']
         log(f"[ai-eval] 통과 — {llm.VARIANTS[r['best']]} {r['best_score']}% ≥ 기준 {r['threshold']}% → AI 분류 켬")
