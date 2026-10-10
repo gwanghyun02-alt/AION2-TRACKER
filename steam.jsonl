@@ -431,3 +431,4 @@
 {"ts": "2026-10-11T00:37:34", "positive": 13746, "negative": 8939, "total": 22685, "steam_pct": 60.6, "steamdb_rating": 60.08, "desc": "Mixed", "new_pos": 0, "new_neg": 0}
 {"ts": "2026-10-11T00:52:36", "positive": 13746, "negative": 8939, "total": 22685, "steam_pct": 60.6, "steamdb_rating": 60.08, "desc": "Mixed", "new_pos": 0, "new_neg": 0}
 {"ts": "2026-10-11T01:07:30", "positive": 13746, "negative": 8939, "total": 22685, "steam_pct": 60.6, "steamdb_rating": 60.08, "desc": "Mixed", "new_pos": 0, "new_neg": 0}
+{"ts": "2026-10-11T01:22:28", "positive": 13800, "negative": 9011, "total": 22811, "steam_pct": 60.5, "steamdb_rating": 59.99, "desc": "Mixed", "new_pos": 54, "new_neg": 72}
