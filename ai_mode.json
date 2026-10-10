@@ -58,8 +58,28 @@
    "failed": 0,
    "ts": "2026-10-09T13:41:47",
    "seconds": 83
+  },
+  {
+   "ok": true,
+   "n": 717,
+   "lexicon": 74.2,
+   "scores": {
+    "ai_only": 70.2,
+    "h_only": 77.3,
+    "hm": 73.6,
+    "neutral_hm": 69.0,
+    "neutral_h": 76.2
+   },
+   "best": "h_only",
+   "best_score": 77.3,
+   "threshold": 79.2,
+   "passed": false,
+   "failed": 0,
+   "ts": "2026-10-10T17:41:34",
+   "seconds": 92
   }
  ],
  "enabled_at": "2026-10-07T18:05:49",
- "disabled_at": "2026-10-09T13:41:47"
+ "disabled_at": "2026-10-09T13:41:47",
+ "eval_version": "2026-10-10-noleak"
 }
