@@ -690,3 +690,4 @@
 {"ts": "2026-10-12T20:11:06", "tag": "translate-top3", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 1, "in": 2, "out": 78, "cache_read": 1397, "cache_write": 468, "usd": 0.0, "notional_usd": 0.0028}
 {"ts": "2026-10-12T20:41:06", "tag": "translate-top3", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 1, "in": 2, "out": 103, "cache_read": 1397, "cache_write": 486, "usd": 0.0, "notional_usd": 0.00312}
 {"ts": "2026-10-12T21:11:06", "tag": "translate-top3", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 4, "in": 2, "out": 208, "cache_read": 1397, "cache_write": 557, "usd": 0.0, "notional_usd": 0.00445}
+{"ts": "2026-10-12T21:41:05", "tag": "translate-top3", "backend": "subscription", "model": "claude-sonnet-5-5", "n": 1, "in": 2, "out": 134, "cache_read": 1397, "cache_write": 508, "usd": 0.0, "notional_usd": 0.00352}
