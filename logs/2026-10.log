@@ -2426,3 +2426,17 @@ RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
 [2026-10-13 15:10:55] [dc] 게시글 73 · 댓글 276 → 긍정 6.6% / 부정 11.7% {'list': 'pc', 'views_fetched': 84, 'views_planned': 84, 'partial': False, 'prev_window_revisits': 11}
 [2026-10-13 15:10:55] [steamforum] 게시글 1 · 댓글 11 → 긍정 8.3% / 부정 16.7% {'topics_active': 9}
 [2026-10-13 15:22:41] [steam] SteamDB 58.13% / Steam 58.53% (16,087+ / 11,399-) Mixed
+[2026-10-13 15:37:33] [steam] SteamDB 58.12% / Steam 58.51% (16,103+ / 11,418-) Mixed
+[2026-10-13 15:37:33] [community] 창 10-13 15:00 ~ 15:30 수집 시작
+[2026-10-13 15:39:13] [dc] PC 목록 응답 없음 → 모바일 목록으로 대체
+[2026-10-13 15:40:53] [dc] 실패: DC 목록을 받지 못함(일시 차단 가능성)
+Traceback (most recent call last):
+  File "/home/runner/work/AION2-TRACKER/AION2-TRACKER/tracker.py", line 1144, in worker
+    results[name] = fn(ws, we)
+                    ^^^^^^^^^^
+  File "/home/runner/work/AION2-TRACKER/AION2-TRACKER/tracker.py", line 427, in collect_dc
+    raise RuntimeError('DC 목록을 받지 못함(일시 차단 가능성)')
+RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
+
+[2026-10-13 15:40:53] [reddit] 게시글 5 · 댓글 142 → 긍정 14.3% / 부정 19.0% {'comment_pages': 2}
+[2026-10-13 15:40:53] [steamforum] 게시글 0 · 댓글 14 → 긍정 28.6% / 부정 28.6% {'topics_active': 10}
