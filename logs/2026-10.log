@@ -3685,3 +3685,8 @@ RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
 [2026-10-17 19:10:02] [dc] 게시글 36 · 댓글 137 → 긍정 8.1% / 부정 13.3% {'list': 'pc', 'views_fetched': 44, 'views_planned': 44, 'partial': False, 'prev_window_revisits': 8}
 [2026-10-17 19:10:02] [steamforum] 게시글 0 · 댓글 6 → 긍정 33.3% / 부정 16.7% {'topics_active': 6}
 [2026-10-17 19:22:32] [steam] SteamDB 58.44% / Steam 58.83% (19,443+ / 13,609-) Mixed
+[2026-10-17 19:37:42] [steam] SteamDB 58.44% / Steam 58.83% (19,443+ / 13,609-) Mixed
+[2026-10-17 19:37:42] [community] 창 10-17 19:00 ~ 19:30 수집 시작
+[2026-10-17 19:40:02] [reddit] 게시글 3 · 댓글 98 → 긍정 11.9% / 부정 22.8% {'comment_pages': 2}
+[2026-10-17 19:40:02] [dc] 게시글 39 · 댓글 121 → 긍정 3.1% / 부정 5.6% {'list': 'pc', 'views_fetched': 49, 'views_planned': 49, 'partial': False, 'prev_window_revisits': 10}
+[2026-10-17 19:40:02] [steamforum] 게시글 3 · 댓글 9 → 긍정 0.0% / 부정 16.7% {'topics_active': 9}
