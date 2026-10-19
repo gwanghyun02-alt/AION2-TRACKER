@@ -2,10 +2,7 @@ name: tracker
 # 15분마다: Steam 기록 + 처리 안 된 30분 창 수집(최근 2시간 내 빈 창은 몰아서 채움) + 대시보드 배포.
 # 데이터는 data 브랜치(커밋 누적), 대시보드는 GitHub Pages(Actions 배포).
 on:
-  schedule:
-    # 예약 실행은 '일정을 마지막으로 바꾼 커밋 작성자' 권한으로 돈다. 작성자가 실제 GitHub 계정이 아니면
-    # 예약 실행이 아예 시작되지 않는다(2026-10-08, game-tracker 이름으로 커밋했을 때 75분간 0회).
-    - cron: '7,22,37,52 * * * *'
+  # 2026-10-20 사용자 요청으로 실시간 수집 중단 — 예약 실행 제거(수동/설정 화면 실행만). 다시 켜려면 schedule 블록과 cron-job.org 예약을 복구.
   workflow_dispatch:
 concurrency:
   group: tracker
