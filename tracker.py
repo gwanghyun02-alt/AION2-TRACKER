@@ -29,13 +29,20 @@ import translate as TR
 
 KST = timezone(timedelta(hours=9))
 BASE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(BASE, 'data')
+# 게임별 설정. 소스를 안 쓰려면 해당 값을 null/빈값으로 (예: 서브레딧이 없으면 reddit_sub: null)
+CFG = json.load(open(os.path.join(BASE, 'config.json'), encoding='utf-8'))
+# game_id 가 있으면 데이터·라벨을 게임별 폴더에 따로 쌓는다(홈페이지 설정 탭에서 다른 게임으로 바꿀 때 섞이지 않게).
+# 아이온2(최초 게임)는 game_id 없이 data/ 바로 아래를 그대로 쓴다.
+GAME_ID = re.sub(r'[^a-z0-9_-]', '', str(CFG.get('game_id') or '').lower())
+DATA = os.path.join(BASE, 'data', GAME_ID) if GAME_ID else os.path.join(BASE, 'data')
 ITEMS = os.path.join(DATA, 'items')
-LABEL_DIR = os.path.join(BASE, '라벨링')
+LABEL_DIR = os.path.join(BASE, '라벨링', GAME_ID) if GAME_ID else os.path.join(BASE, '라벨링')
 # GitHub Actions 에서 돌 때(TRACKER_CLOUD=1): data/ 는 data 브랜치를 체크아웃한 폴더라 로그도 그 안에 둬야 남는다.
 CLOUD = os.environ.get('TRACKER_CLOUD') == '1'
 LOG_DIR = os.path.join(DATA, 'logs') if CLOUD else os.path.join(BASE, 'logs')
-LABELS_ENC = os.path.join(BASE, 'labels.enc')  # 클라우드용 라벨(판단 이유 포함) — 공개 저장소라 암호화
+# 클라우드용 라벨(판단 이유 포함) — 공개 저장소라 암호화
+LABELS_ENC = os.path.join(BASE, 'labels', f'{GAME_ID}.enc') if GAME_ID else os.path.join(BASE, 'labels.enc')
+TR.GAME_CACHE_P = os.path.join(DATA, 'translations_game.json')  # 게임 맥락 번역은 게임(용어집)마다 따로
 LABELS_KEY_FILE = os.path.join(os.path.expanduser('~'), '.config', 'github', 'labels_key.txt')
 for d in (DATA, ITEMS, LABEL_DIR, LOG_DIR):
     os.makedirs(d, exist_ok=True)
@@ -55,8 +62,7 @@ def item_files():
         out += [os.path.join(root, f) for f in files if f.endswith('.jsonl')]
     return sorted(out)
 
-# 게임별 설정. 소스를 안 쓰려면 해당 값을 null/빈값으로 (예: 서브레딧이 없으면 reddit_sub: null)
-CFG = json.load(open(os.path.join(BASE, 'config.json'), encoding='utf-8'))
+
 GAME = CFG.get('game', '게임')
 APP_ID = CFG.get('steam_appid')
 SUB = CFG.get('reddit_sub')
@@ -626,6 +632,7 @@ def export_labels(out_path=LABELS_ENC):
         open(LABELS_KEY_FILE, 'w', encoding='utf-8').write(Fernet.generate_key().decode())
     labeled, files = load_labels()
     blob = json.dumps({'rows': labeled, 'files': files}, ensure_ascii=False).encode('utf-8')
+    os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
     open(out_path, 'wb').write(_fernet().encrypt(blob))
     return len(labeled)
 
@@ -634,6 +641,8 @@ def load_labels():
     """라벨링 폴더의 모든 검토 엑셀에서 '내 판단' 이 채워진 행을 읽는다(mtime 캐시).
     클라우드에서는 엑셀 대신 labels.enc(암호화, 키는 GitHub 비밀값 LABELS_KEY)를 읽는다."""
     if CLOUD:
+        if not os.path.exists(LABELS_ENC):  # 새 게임: 아직 라벨 없음(정상)
+            return [], []
         try:
             d = json.loads(_fernet().decrypt(open(LABELS_ENC, 'rb').read()).decode('utf-8'))
             return d['rows'], d['files']

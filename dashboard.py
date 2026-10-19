@@ -24,6 +24,8 @@ def build(base, cfg, sources, steam, runs, labels, out_path=None, public=False):
         'runs': runs,
         'labels': labels,
         'public': public,
+        'config': cfg,  # 설정 탭 초기값(비밀값 없음)
+        'repo': os.environ.get('GITHUB_REPOSITORY') or cfg.get('repo', ''),
     }
     js = json.dumps(data, ensure_ascii=False).replace('</', '<\\/')
     import html as _h
@@ -125,6 +127,27 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .note{font-size:12px;color:var(--muted);margin-top:6px}
 .empty{color:var(--muted);padding:24px;text-align:center}
 @media (max-width:600px){.kpi .val{font-size:22px}.hbar{grid-template-columns:84px 1fr 40px}}
+
+.topnav{display:flex;gap:4px;margin:0 0 16px}
+.topnav button{border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);border-radius:8px;padding:6px 16px;font:inherit;font-weight:600;cursor:pointer}
+.topnav button.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin:12px 0 14px}
+.tabs button{border:1px solid var(--border);border-bottom:none;background:var(--surface-2);color:var(--text-2);border-radius:8px 8px 0 0;padding:7px 14px;font:inherit;font-size:13px;cursor:pointer;margin-bottom:-1px}
+.tabs button.on{background:var(--surface);color:var(--text);font-weight:600}
+.tabs button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:6px;vertical-align:1px;background:var(--neu)}
+.tabs button .dot.ok{background:var(--pos)}.tabs button .dot.bad{background:var(--neg)}
+.field{margin:0 0 14px}
+.field label{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+.help{font-size:12px;color:var(--muted);margin-top:3px}
+.field input[type=text],.field input[type=password],.field textarea,.field select{width:100%;box-sizing:border-box;border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:6px;padding:7px 9px;font:inherit;font-size:13px}
+.field textarea{min-height:120px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.detect{font-size:12px;padding:6px 9px;border-radius:6px;background:var(--surface-2);margin-top:6px}
+.msg{font-size:13px;padding:8px 12px;border-radius:8px;margin:8px 0}
+.msg.err{background:color-mix(in srgb,var(--neg) 14%,transparent)}.msg.ok{background:color-mix(in srgb,var(--pos) 14%,transparent)}.msg.info{background:var(--surface-2)}
+.btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:8px;padding:7px 14px;font:inherit;font-size:13px;cursor:pointer}
+.btn.primary{background:var(--text);color:var(--surface);border-color:var(--text);font-weight:600}
+pre.cfg{background:var(--surface-2);border-radius:8px;padding:10px;font-size:11px;max-height:260px;overflow:auto;white-space:pre-wrap;word-break:break-all}
 </style>
 </head>
 <body>
@@ -134,6 +157,8 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   <span class="sub" id="gen"></span>
   <button class="theme" id="theme" type="button">테마 전환</button>
 </header>
+<nav class="topnav" role="tablist"><button data-view="dash" class="on">대시보드</button><button data-view="settings">설정</button></nav>
+<div id="view-dash">
 <div id="warn"></div>
 <div class="grid kpis" id="kpis"></div>
 
@@ -217,6 +242,56 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <section class="card">
   <h2>수집 로그</h2>
   <div class="scroll" style="max-height:340px"><table><thead><tr><th>창</th><th id="log-heads" style="display:none"></th><th>검토 엑셀</th></tr></thead><tbody id="runlog"></tbody></table></div>
+</section>
+</div>
+</div>
+<div id="view-settings" hidden>
+<section class="card">
+  <h2>다른 게임에 적용하기</h2>
+  <div class="sub">게임과 참고사이트를 바꿔 저장하면, 다음 수집부터 그 게임의 유저 반응을 수집·번역·분류합니다. 게임을 바꾸면 데이터는 게임별로 따로 쌓입니다(기존 게임 데이터는 그대로 보존).</div>
+  <div class="tabs" id="cfg-tabs">
+    <button data-tab="game" class="on">① 적용게임<span class="dot" id="dot-game"></span></button>
+    <button data-tab="s1">② 참고사이트 1<span class="dot" id="dot-s1"></span></button>
+    <button data-tab="s2">③ 참고사이트 2<span class="dot" id="dot-s2"></span></button>
+    <button data-tab="s3">④ 참고사이트 3<span class="dot" id="dot-s3"></span></button>
+  </div>
+
+  <div class="tabpanel" data-tab="game">
+    <div class="row2">
+      <div class="field"><label for="cfg-game">게임 이름 (한글)</label><input type="text" id="cfg-game" placeholder="예: 아이온2"><div class="help">대시보드 제목과 AI 번역·분류 지침에 쓰입니다.</div></div>
+      <div class="field"><label for="cfg-game-en">게임 영문 이름</label><input type="text" id="cfg-game-en" placeholder="예: AION2"><div class="help">게임 구분 ID로도 쓰여, 바꾸면 새 데이터 폴더에 쌓입니다.</div></div>
+    </div>
+    <div class="field"><label for="cfg-appid">Steam 앱 ID 또는 상점 주소 (선택)</label><input type="text" id="cfg-appid" placeholder="예: 3393110 또는 https://store.steampowered.com/app/3393110/"><div class="help">SteamDB 평점(15분 기록)에 쓰입니다. Steam에 없는 게임이면 비워 두세요.</div><div class="detect" id="det-appid" hidden></div></div>
+    <div class="field"><label for="cfg-glossary">번역 용어집 — 한 줄에 하나, <code>원문 = 한국어</code></label><textarea id="cfg-glossary" placeholder="Gladiator = 검성&#10;Elyos = 천족&#10;Combat Power / CP = 전투력"></textarea>
+      <div class="help">해외 반응을 이 게임에 맞게 번역하는 기준입니다. 직업·진영·재화·콘텐츠 이름을 한국 서비스 명칭으로 적어 주세요. 같은 뜻의 원문이 여럿이면 <code>/</code>로 묶습니다.</div></div>
+    <div class="field"><label for="cfg-note">번역 참고 메모 (선택)</label><input type="text" id="cfg-note" placeholder="예: 확실하지 않은 고유명사는 원문을 괄호로 병기"></div>
+    <div class="field"><label for="cfg-topics">주제 분류 키워드 (선택) — 한 줄에 하나, <code>주제 = 키워드, 키워드</code></label><textarea id="cfg-topics" style="min-height:70px" placeholder="밸런스/직업 = 검성, 수호성, gladiator&#10;PvP/어비스 = 어비스, abyss"></textarea>
+      <div class="help">'부정 반응 성격'과 Top 3 주제 분류에 그 게임 고유 단어를 더합니다.</div></div>
+  </div>
+
+  <div class="tabpanel" data-tab="s1" hidden></div>
+  <div class="tabpanel" data-tab="s2" hidden></div>
+  <div class="tabpanel" data-tab="s3" hidden></div>
+</section>
+
+<section class="card">
+  <h2>저장</h2>
+  <div id="cfg-msgs"></div>
+  <details><summary class="sub" style="cursor:pointer">저장될 설정 미리보기 (config.json)</summary><pre class="cfg" id="cfg-preview"></pre></details>
+  <div class="row2" style="margin-top:12px">
+    <div class="field"><label for="cfg-token">GitHub 토큰 (저장용)</label><input type="password" id="cfg-token" autocomplete="off" placeholder="github_pat_…">
+      <div class="help">이 저장소의 <b>Contents 쓰기</b> 권한이 있는 토큰. 토큰은 이 브라우저에서 GitHub로만 전송되고 페이지에 저장되지 않습니다.</div>
+      <label style="font-weight:400;font-size:12px;margin-top:6px"><input type="checkbox" id="cfg-remember"> 이 브라우저에 토큰 기억</label></div>
+    <div class="field"><label>저장 후</label>
+      <label style="font-weight:400;font-size:13px"><input type="checkbox" id="cfg-run"> 바로 1회 수집 실행 (Actions 쓰기 권한 필요)</label>
+      <div class="help">실시간(15분) 수집은 현재 중단 상태입니다. 다시 켜려면 관리자에게 요청하세요.</div></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn primary" id="cfg-save" type="button">GitHub에 저장</button>
+    <button class="btn" id="cfg-download" type="button">설정 파일 내려받기</button>
+    <button class="btn" id="cfg-reset" type="button">현재 적용값으로 되돌리기</button>
+  </div>
+  <div id="cfg-status"></div>
 </section>
 </div>
 <div class="tip" id="tip"></div>
@@ -357,8 +432,8 @@ function barChart(box, bars, opt){
       b.segs.forEach((s, k) => { const h = s.v / tot * 100; if (h <= 0) return;
         const y1 = y(acc + h), y0 = y(acc); el('rect', {x:x0, y:y1 + (k ? 0 : 0), width:w, height:Math.max(0, y0 - y1 - (acc + h < 100 ? 1 : 0)), fill:css(s.c)}, g); acc += h; });
     } else {
-      if (b.up) el('rect', {x:x0, y:y(b.up), width:w, height:y(0)-y(b.up)-1, fill:css('--pos'), rx: Math.min(2, w/2)}, g);
-      if (b.down) el('rect', {x:x0, y:y(0)+1, width:w, height:y(-b.down)-y(0)-1, fill:css('--neg'), rx: Math.min(2, w/2)}, g);
+      if (b.up) el('rect', {x:x0, y:y(b.up), width:w, height:Math.max(0, y(0)-y(b.up)-1), fill:css('--pos'), rx: Math.min(2, w/2)}, g);
+      if (b.down) el('rect', {x:x0, y:y(0)+1, width:w, height:Math.max(0, y(-b.down)-y(0)-1), fill:css('--neg'), rx: Math.min(2, w/2)}, g);
     }
     const hit = el('rect', {x:m.l + i*bw, y:m.t, width:bw, height:H-m.t-m.b, fill:'transparent'}, g);
     hit.addEventListener('mousemove', e => showTip(e, b.html)); hit.addEventListener('mouseleave', hideTip);
@@ -590,6 +665,162 @@ document.querySelectorAll('.btns').forEach(g => g.addEventListener('click', e =>
 }));
 let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
 render();
+
+// ===================================================================== 설정 (다른 게임에 적용)
+const CFG0 = D.config || {}, REPO = D.repo || '';
+const SITE_TYPES = {reddit: 'Reddit 서브레딧', dc: 'DC인사이드 갤러리', steamforum: 'Steam 토론', none: '사용 안 함'};
+function parseSite(raw){
+  const s = (raw || '').trim(); if (!s) return null;
+  let m;
+  if ((m = s.match(/reddit\.com\/r\/([A-Za-z0-9_]+)/i)) || (m = s.match(/^r\/([A-Za-z0-9_]+)$/i))) return {type: 'reddit', id: m[1]};
+  if ((m = s.match(/gall\.dcinside\.com\/(mgallery\/|mini\/)?board\/[a-z]+\/?\?(?:[^#]*&)?id=([A-Za-z0-9_]+)/i)))
+    return {type: 'dc', id: m[2], dcType: m[1] ? m[1].replace('/', '').replace('mgallery', 'mgallery').replace('mini', 'mini') : 'board'};
+  if ((m = s.match(/m\.dcinside\.com\/(?:mini\/)?board\/([A-Za-z0-9_]+)/i))) return {type: 'dc', id: m[1], dcType: /\/mini\//.test(s) ? 'mini' : 'mgallery', guessed: true};
+  if ((m = s.match(/steamcommunity\.com\/app\/(\d+)/i)) || (m = s.match(/store\.steampowered\.com\/app\/(\d+)/i))) return {type: 'steamforum', id: m[1]};
+  return null;
+}
+function appidOf(s){ const m = String(s || '').match(/app\/(\d+)/) || String(s || '').match(/^\s*(\d+)\s*$/); return m ? +m[1] : null; }
+function siteTab(n){
+  return `<div class="field"><label for="s${n}-url">사이트 주소</label><input type="text" id="s${n}-url" placeholder="예: https://www.reddit.com/r/Aion2/  ·  https://gall.dcinside.com/mgallery/board/lists/?id=aion2  ·  https://steamcommunity.com/app/3393110/discussions/">
+      <div class="help">게시판 주소를 그대로 붙여 넣으면 종류와 식별값을 자동으로 알아냅니다.</div><div class="detect" id="s${n}-det" hidden></div></div>
+    <div class="row2">
+      <div class="field"><label for="s${n}-type">종류</label><select id="s${n}-type">${Object.entries(SITE_TYPES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
+      <div class="field"><label for="s${n}-id">식별값</label><input type="text" id="s${n}-id" placeholder="서브레딧 이름 / 갤러리 id / Steam 앱 ID"></div>
+      <div class="field" id="s${n}-dcwrap"><label for="s${n}-dctype">DC 갤러리 종류</label><select id="s${n}-dctype"><option value="mgallery">마이너 갤러리</option><option value="board">정식 갤러리</option><option value="mini">미니 갤러리</option></select></div>
+    </div>
+    <div class="help">지원: Reddit(RSS), DC인사이드(목록·모바일 글), Steam 토론(게시판 자동 탐색). 같은 종류는 한 번만 쓸 수 있습니다.</div>`;
+}
+const SITE_URL = {reddit: id => `https://www.reddit.com/r/${id}/`, dc: (id, t) => `https://gall.dcinside.com/${t === 'board' ? '' : t + '/'}board/lists/?id=${id}`, steamforum: id => `https://steamcommunity.com/app/${id}/discussions/`};
+function fillSettings(c){
+  $('#cfg-game').value = c.game || ''; $('#cfg-game-en').value = c.game_en || '';
+  $('#cfg-appid').value = c.steam_appid || '';
+  $('#cfg-glossary').value = Object.entries(c.glossary || {}).map(([k, v]) => `${k} = ${v}`).join('\n');
+  $('#cfg-note').value = c.glossary_note || '';
+  $('#cfg-topics').value = Object.entries(c.topic_extra || {}).map(([k, v]) => `${k} = ${(v || []).join(', ')}`).join('\n');
+  const sites = [];
+  if (c.reddit_sub) sites.push({type: 'reddit', id: c.reddit_sub});
+  if (c.dc_id) sites.push({type: 'dc', id: c.dc_id, dcType: c.dc_type || 'mgallery'});
+  if (c.steam_appid && c.steam_forums !== false) sites.push({type: 'steamforum', id: String(c.steam_appid)});
+  for (let n = 1; n <= 3; n++){
+    const s = sites[n - 1];
+    $(`#s${n}-url`).value = s ? SITE_URL[s.type](s.id, s.dcType) : '';
+    $(`#s${n}-type`).value = s ? s.type : 'none'; $(`#s${n}-id`).value = s ? s.id : ''; $(`#s${n}-dctype`).value = (s && s.dcType) || 'mgallery';
+  }
+  updateSettings();
+}
+function lines(txt){ return (txt || '').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')); }
+function buildConfig(){
+  const errs = [], warns = [];
+  const c = JSON.parse(JSON.stringify(CFG0));
+  c.game = $('#cfg-game').value.trim(); c.game_en = $('#cfg-game-en').value.trim();
+  if (!c.game) errs.push('① 적용게임: 게임 이름(한글)을 입력하세요.');
+  if (!c.game_en) errs.push('① 적용게임: 영문 이름을 입력하세요.');
+  const slug = c.game_en.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const sameGame = slug && slug === String(CFG0.game_en || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  if (sameGame) { if (CFG0.game_id) c.game_id = CFG0.game_id; else delete c.game_id; }
+  else if (slug) { c.game_id = slug; c.task_prefix = c.game_en.replace(/[^A-Za-z0-9]/g, '') + 'Tracker'; warns.push(`게임이 바뀝니다 → 데이터는 새 폴더(data/${slug})에 쌓이고, 기존 게임 데이터는 그대로 남습니다. 라벨·AI 학습 상태도 새로 시작합니다.`); }
+  const aRaw = $('#cfg-appid').value.trim(), appid = appidOf(aRaw);
+  if (aRaw && !appid) errs.push('① 적용게임: Steam 앱 ID는 숫자이거나 상점 주소여야 합니다.');
+  c.steam_appid = appid || null;
+  const gl = {}; lines($('#cfg-glossary').value).forEach((l, i) => { const k = l.indexOf('='); if (k < 1) { errs.push(`① 용어집 ${i + 1}번째 줄에 '=' 가 없습니다: ${l}`); return; } gl[l.slice(0, k).trim()] = l.slice(k + 1).trim(); });
+  c.glossary = gl; c.glossary_note = $('#cfg-note').value.trim();
+  if (!sameGame && slug && JSON.stringify(gl) === JSON.stringify(CFG0.glossary || {})) warns.push(`번역 용어집이 이전 게임(${CFG0.game || ''}) 것 그대로입니다 — 새 게임의 직업·진영·재화 이름으로 바꿔 주세요.`);
+  if (!Object.keys(gl).length) warns.push('번역 용어집이 비어 있습니다 — 직업·진영·재화 이름이 일반 단어로 번역될 수 있습니다.');
+  const te = {}; lines($('#cfg-topics').value).forEach(l => { const k = l.indexOf('='); if (k > 0) te[l.slice(0, k).trim()] = l.slice(k + 1).split(',').map(x => x.trim()).filter(Boolean); });
+  c.topic_extra = te;
+  if (!sameGame && slug && JSON.stringify(te) === JSON.stringify(CFG0.topic_extra || {})) warns.push(`주제 분류 키워드가 이전 게임 것 그대로입니다.`);
+  c.reddit_sub = null; c.dc_id = null; c.steam_forums = false;
+  const used = {};
+  for (let n = 1; n <= 3; n++){
+    const t = $(`#s${n}-type`).value, id = $(`#s${n}-id`).value.trim();
+    if (t === 'none') continue;
+    if (!id) { errs.push(`참고사이트 ${n}: 식별값을 입력하세요.`); continue; }
+    if (used[t]) { errs.push(`참고사이트 ${n}: '${SITE_TYPES[t]}' 종류는 이미 참고사이트 ${used[t]}에서 쓰고 있습니다(종류별 1개).`); continue; }
+    used[t] = n;
+    if (t === 'reddit') { if (!/^[A-Za-z0-9_]{2,21}$/.test(id)) errs.push(`참고사이트 ${n}: 서브레딧 이름 형식이 아닙니다.`); c.reddit_sub = id; c.reddit_bots = ['automoderator', id.toLowerCase() + '-modteam']; }
+    if (t === 'dc') { if (!/^[A-Za-z0-9_]+$/.test(id)) errs.push(`참고사이트 ${n}: DC 갤러리 id 형식이 아닙니다.`); c.dc_id = id; c.dc_type = $(`#s${n}-dctype`).value; }
+    if (t === 'steamforum') { const a = appidOf(id); if (!a) errs.push(`참고사이트 ${n}: Steam 앱 ID(숫자)가 필요합니다.`); else { c.steam_forums = {}; if (!c.steam_appid) c.steam_appid = a; else if (c.steam_appid !== a) warns.push(`참고사이트 ${n}의 Steam 앱 ID(${a})가 적용게임 탭의 앱 ID(${c.steam_appid})와 다릅니다 — 적용게임 쪽 ID로 수집합니다.`); } }
+  }
+  if (!Object.keys(used).length) errs.push('참고사이트를 최소 1개 지정하세요.');
+  return {c, errs, warns, used};
+}
+function updateSettings(){
+  // 자동 인식 표시
+  for (let n = 1; n <= 3; n++){
+    const t = $(`#s${n}-type`).value;
+    $(`#s${n}-dcwrap`).style.display = t === 'dc' ? '' : 'none';
+  }
+  const a = appidOf($('#cfg-appid').value);
+  const da = $('#det-appid'); da.hidden = !$('#cfg-appid').value.trim(); da.textContent = a ? `✓ Steam 앱 ${a} — SteamDB 평점을 기록합니다` : '✗ 앱 ID를 찾지 못했습니다';
+  const {c, errs, warns, used} = buildConfig();
+  $('#dot-game').className = 'dot ' + (c.game && c.game_en ? 'ok' : 'bad');
+  for (let n = 1; n <= 3; n++){ const t = $(`#s${n}-type`).value; $(`#dot-s${n}`).className = 'dot ' + (t === 'none' ? '' : $(`#s${n}-id`).value.trim() ? 'ok' : 'bad'); }
+  $('#cfg-msgs').innerHTML = errs.map(e => `<div class="msg err">✗ ${esc(e)}</div>`).join('') + warns.map(w => `<div class="msg info">ⓘ ${esc(w)}</div>`).join('')
+    + (errs.length ? '' : `<div class="msg ok">✓ 저장 가능 — ${esc(c.game)} · ${Object.keys(used).map(t => SITE_TYPES[t]).join(', ')}${c.steam_appid ? ' · SteamDB 평점' : ''}</div>`);
+  $('#cfg-preview').textContent = JSON.stringify(c, null, 2);
+  $('#cfg-save').disabled = !!errs.length;
+  return {c, errs};
+}
+function initSettings(){
+  for (let n = 1; n <= 3; n++) document.querySelector(`.tabpanel[data-tab="s${n}"]`).innerHTML = siteTab(n);
+  for (let n = 1; n <= 3; n++){
+    $(`#s${n}-url`).addEventListener('input', () => {
+      const p = parseSite($(`#s${n}-url`).value), d = $(`#s${n}-det`);
+      d.hidden = !$(`#s${n}-url`).value.trim();
+      if (p) { $(`#s${n}-type`).value = p.type; $(`#s${n}-id`).value = p.id; if (p.dcType) $(`#s${n}-dctype`).value = p.dcType;
+        d.textContent = `✓ ${SITE_TYPES[p.type]} · ${p.id}` + (p.type === 'dc' ? ` (${({mgallery: '마이너', board: '정식', mini: '미니'})[p.dcType] || p.dcType} 갤러리${p.guessed ? ', 모바일 주소라 종류는 추정 — 확인하세요' : ''})` : ''); }
+      else d.textContent = '✗ 알 수 없는 주소입니다 — 종류와 식별값을 직접 고르세요';
+      updateSettings();
+    });
+  }
+  document.querySelectorAll('#view-settings input, #view-settings textarea, #view-settings select').forEach(e => e.addEventListener('input', updateSettings));
+  $('#cfg-tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#cfg-tabs button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.tabpanel').forEach(p => p.hidden = p.dataset.tab !== b.dataset.tab); });
+  try { const t = localStorage.getItem('tracker-gh-token'); if (t) { $('#cfg-token').value = t; $('#cfg-remember').checked = true; } } catch(e) {}
+  $('#cfg-reset').onclick = () => fillSettings(CFG0);
+  $('#cfg-download').onclick = () => { const {c} = updateSettings(); const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(c, null, 2)], {type: 'application/json'})); a.download = 'config.json'; a.click(); };
+  $('#cfg-save').onclick = saveSettings;
+  fillSettings(CFG0);
+}
+function b64utf8(str){ const b = new TextEncoder().encode(str); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); }
+async function saveSettings(){
+  const st = $('#cfg-status'), say = (cls, h) => st.innerHTML = `<div class="msg ${cls}">${h}</div>`;
+  const {c, errs} = updateSettings(); if (errs.length) return;
+  const tok = $('#cfg-token').value.trim();
+  if (!REPO) return say('err', '✗ 저장소 정보가 없는 페이지입니다(로컬 파일). 설정 파일 내려받기를 쓰세요.');
+  if (!tok) return say('err', '✗ GitHub 토큰을 입력하세요.');
+  try { if ($('#cfg-remember').checked) localStorage.setItem('tracker-gh-token', tok); else localStorage.removeItem('tracker-gh-token'); } catch(e) {}
+  const H = {Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json'};
+  const api = `https://api.github.com/repos/${REPO}`;
+  say('info', '저장 중…');
+  try {
+    const cur = await fetch(`${api}/contents/config.json?ref=main`, {headers: H});
+    if (!cur.ok) throw new Error(`현재 설정 읽기 실패 (HTTP ${cur.status}${cur.status === 401 ? ' — 토큰 확인' : cur.status === 404 ? ' — 토큰의 저장소 권한 확인' : ''})`);
+    const sha = (await cur.json()).sha;
+    const put = await fetch(`${api}/contents/config.json`, {method: 'PUT', headers: H, body: JSON.stringify({
+      message: `설정: ${c.game} (${Object.entries({reddit: c.reddit_sub, dc: c.dc_id, steam: c.steam_forums !== false ? c.steam_appid : null}).filter(([, v]) => v).map(([k]) => k).join('·')})`,
+      content: b64utf8(JSON.stringify(c, null, 2) + '\n'), sha, branch: 'main'})});
+    if (!put.ok) throw new Error(`저장 실패 (HTTP ${put.status}${put.status === 403 ? ' — 토큰에 Contents 쓰기 권한 필요' : ''})`);
+    const commit = (await put.json()).commit;
+    let runMsg = '';
+    if ($('#cfg-run').checked) {
+      const d = await fetch(`${api}/actions/workflows/tracker.yml/dispatches`, {method: 'POST', headers: H, body: JSON.stringify({ref: 'main'})});
+      runMsg = d.status === 204 ? ' · 수집 1회 실행을 요청했습니다(몇 분 뒤 이 페이지가 새 게임으로 갱신)' : ` · 수집 실행 요청 실패(HTTP ${d.status}, Actions 쓰기 권한 확인)`;
+    }
+    say('ok', `✓ 저장했습니다 — <a href="${esc(commit.html_url)}" target="_blank" rel="noopener">변경 기록 보기</a>${runMsg}`);
+  } catch(e) { say('err', '✗ ' + esc(e.message)); }
+}
+function showView(v){
+  document.querySelectorAll('.topnav button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  $('#view-dash').hidden = v !== 'dash'; $('#view-settings').hidden = v !== 'settings';
+  try { history.replaceState(null, '', v === 'settings' ? '#settings' : location.pathname); } catch(e) {}
+  if (v === 'dash') render();
+}
+document.querySelector('.topnav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
+initSettings();
+if (location.hash === '#settings') showView('settings');
 </script>
 </body>
 </html>
