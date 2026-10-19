@@ -4344,3 +4344,13 @@ RuntimeError: DC 목록을 받지 못함(일시 차단 가능성)
 [2026-10-20 00:12:02] [dc] 게시글 42 · 댓글 188 → 긍정 9.1% / 부정 15.2% {'list': 'pc', 'views_fetched': 53, 'views_planned': 53, 'partial': False, 'prev_window_revisits': 11}
 [2026-10-20 00:12:02] [steamforum] 게시글 1 · 댓글 15 → 긍정 37.5% / 부정 6.2% {'topics_active': 12}
 [2026-10-20 00:22:46] [steam] SteamDB 57.78% / Steam 58.13% (20,303+ / 14,625-) Mixed
+[2026-10-20 01:06:52] [steam] SteamDB 57.78% / Steam 58.13% (20,303+ / 14,625-) Mixed
+[2026-10-20 01:06:52] [community] 창 10-20 00:00 ~ 00:30 수집 시작
+[2026-10-20 01:11:03] [reddit] 게시글 8 · 댓글 159 → 긍정 15.6% / 부정 21.0% {'comment_pages': 4}
+[2026-10-20 01:11:03] [dc] 게시글 26 · 댓글 135 → 긍정 8.7% / 부정 8.1% {'list': 'pc', 'views_fetched': 40, 'views_planned': 40, 'partial': False, 'prev_window_revisits': 14}
+[2026-10-20 01:11:03] [steamforum] 게시글 3 · 댓글 20 → 긍정 17.4% / 부정 21.7% {'topics_active': 20}
+[2026-10-20 01:11:06] [community] 창 10-20 00:30 ~ 01:00 수집 시작
+[2026-10-20 01:11:06] [reddit] 429 /r/Aion2/new/.rss?limit=100 (재시도 1)
+[2026-10-20 01:16:02] [reddit] 게시글 4 · 댓글 202 → 긍정 16.0% / 부정 18.0% {'comment_pages': 3}
+[2026-10-20 01:16:02] [dc] 게시글 36 · 댓글 97 → 긍정 11.3% / 부정 12.0% {'list': 'pc', 'views_fetched': 36, 'views_planned': 36, 'partial': False, 'prev_window_revisits': 0}
+[2026-10-20 01:16:02] [steamforum] 게시글 2 · 댓글 14 → 긍정 12.5% / 부정 50.0% {'topics_active': 13}
